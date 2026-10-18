@@ -351,8 +351,16 @@ private fun ProfileEditorDialog(
             }
         },
         confirmButton = {
-            Button(onClick = { onSave(name, color, icon) }) { Text("Simpan") }
+            Button(
+                onClick = { onSave(name, color, icon) },
+                content = { Text("Simpan") },
+            )
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Batal") } },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+                content = { Text("Batal") },
+            )
+        },
     }
 }
