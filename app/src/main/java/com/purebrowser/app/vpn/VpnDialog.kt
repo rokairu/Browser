@@ -104,7 +104,7 @@ fun VpnDialog(onClose: () -> Unit) {
         text = {
             Column {
                 Text(
-                    text = "PureBrowser tidak menyediakan server VPN. Impor berkas .conf dari provider VPN legit pilihanmu (mis. Mullvad, ProtonVPN, IVPN, atau server pribadimu). " +,
+                    text = "PureBrowser tidak menyediakan server VPN. Impor berkas .conf dari provider VPN legit pilihanmu (mis. Mullvad, ProtonVPN, IVPN, atau server pribadimu). " +
                         "Hanya traffic browser ini yang masuk tunnel.",
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
