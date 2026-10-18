@@ -138,8 +138,8 @@ private fun ProfilePickerScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(text = 
-                    "PureBrowser",
+                Text(
+                    text = "PureBrowser",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f),
@@ -166,8 +166,8 @@ private fun ProfilePickerScreen(
             Spacer(Modifier.height(8.dp))
             Text(text = "Siapa yang browsing?", fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
-            Text(text = 
-                "Tiap profil punya cookie, riwayat, bookmark, dan login sendiri.",
+            Text(
+                text = "Tiap profil punya cookie, riwayat, bookmark, dan login sendiri.",
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 fontSize = 14.sp,
             )
@@ -333,8 +333,9 @@ private fun ProfileEditorDialog(
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Profile.ICONS.take(8).forEach { ic ->
-                        Text(text = 
-                            ic, fontSize = if (ic == icon) 28.sp else 22.sp,
+                        Text(
+                            text = ic,
+                            fontSize = if (ic == icon) 28.sp else 22.sp,
                             modifier = Modifier.clickable { icon = ic }.padding(2.dp),
                         )
                     }
@@ -342,8 +343,9 @@ private fun ProfileEditorDialog(
                 Spacer(Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Profile.ICONS.drop(8).forEach { ic ->
-                        Text(text = 
-                            ic, fontSize = if (ic == icon) 28.sp else 22.sp,
+                        Text(
+                            text = ic,
+                            fontSize = if (ic == icon) 28.sp else 22.sp,
                             modifier = Modifier.clickable { icon = ic }.padding(2.dp),
                         )
                     }
