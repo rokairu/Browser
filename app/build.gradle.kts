@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.purebrowser.app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.purebrowser.app"
@@ -54,7 +54,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
     // Mesin browser mandiri (Gecko/Firefox) — bukan System WebView.
-    // v153 = versi terbaru yang masih kompatibel dengan compileSdk 34
+    // v153 = versi terbaru yang lolos AAR metadata check di compileSdk 36
     // (v154+ butuh compileSdk 37 + AGP 9.x).
     implementation("org.mozilla.geckoview:geckoview-arm64-v8a:153.0.20260810162159")
     // Klien WireGuard resmi untuk fitur VPN
