@@ -112,7 +112,7 @@ fun BrowserScreen(
                     modifier = Modifier.size(32.dp).clip(CircleShape)
                         .background(Color(profile.colorArgb)),
                     contentAlignment = Alignment.Center,
-                ) { Text(profile.icon, fontSize = 18.sp) }
+                ) { Text(text = profile.icon, fontSize = 18.sp) }
             }
             IconButton(
                 onClick = { tab?.session?.goBack() },
@@ -148,7 +148,7 @@ fun BrowserScreen(
             Box {
                 IconButton(onClick = { showTabs = true }) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text(
+                        Text(text = 
                             "${tabs.size}",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
@@ -165,27 +165,27 @@ fun BrowserScreen(
                 }
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                     DropdownMenuItem(
-                        text = { Text("Tab baru") },
+                        text = { Text(text = "Tab baru") },
                         onClick = { menuOpen = false; GeckoEngine.newTab(BrowserActivity.HOME_URL) },
                         leadingIcon = { Icon(Icons.Default.Add, null) },
                     )
                     DropdownMenuItem(
-                        text = { Text("Tab privat baru") },
+                        text = { Text(text = "Tab privat baru") },
                         onClick = { menuOpen = false; GeckoEngine.newTab(BrowserActivity.HOME_URL, isPrivate = true) },
                         leadingIcon = { Icon(Icons.Default.Lock, null) },
                     )
                     DropdownMenuItem(
-                        text = { Text("Bookmark") },
+                        text = { Text(text = "Bookmark") },
                         onClick = { menuOpen = false; showBookmarks = true },
                         leadingIcon = { Icon(Icons.Default.Bookmark, null) },
                     )
                     DropdownMenuItem(
-                        text = { Text("Riwayat") },
+                        text = { Text(text = "Riwayat") },
                         onClick = { menuOpen = false; showHistory = true },
                         leadingIcon = { Icon(Icons.Default.History, null) },
                     )
                     DropdownMenuItem(
-                        text = { Text("Unduhan") },
+                        text = { Text(text = "Unduhan") },
                         onClick = {
                             menuOpen = false
                             context.startActivity(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS))
@@ -193,7 +193,7 @@ fun BrowserScreen(
                         leadingIcon = { Icon(Icons.Default.Download, null) },
                     )
                     DropdownMenuItem(
-                        text = { Text("VPN") },
+                        text = { Text(text = "VPN") },
                         onClick = {
                             menuOpen = false
                             // VPN dikelola di proses utama
@@ -206,12 +206,12 @@ fun BrowserScreen(
                         leadingIcon = { Icon(Icons.Default.VpnKey, null) },
                     )
                     DropdownMenuItem(
-                        text = { Text("Ganti profil") },
+                        text = { Text(text = "Ganti profil") },
                         onClick = { menuOpen = false; showProfiles = true },
                         leadingIcon = { Icon(Icons.Default.People, null) },
                     )
                     DropdownMenuItem(
-                        text = { Text("Keluar") },
+                        text = { Text(text = "Keluar") },
                         onClick = { menuOpen = false; onExit() },
                         leadingIcon = { Icon(Icons.Default.ExitToApp, null) },
                     )
@@ -236,7 +236,7 @@ fun BrowserScreen(
             )
         } else {
             Box(Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {
-                Text("Tidak ada tab — buka tab baru dari menu", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                Text(text = "Tidak ada tab — buka tab baru dari menu", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
             }
         }
     }
@@ -285,7 +285,7 @@ private fun AddressBar(tab: Tab?, modifier: Modifier = Modifier) {
                 focused = it.isFocused
                 if (it.isFocused) input = url
             },
-        placeholder = { Text("Cari atau ketik alamat", fontSize = 14.sp) },
+        placeholder = { Text(text = "Cari atau ketik alamat", fontSize = 14.sp) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
         keyboardActions = KeyboardActions(onGo = {
@@ -319,7 +319,7 @@ private fun normalizeInput(raw: String): String {
 private fun TabsDialog(onClose: () -> Unit, onNewTab: () -> Unit) {
     AlertDialog(
         onDismissRequest = onClose,
-        title = { Text("Tab (${GeckoEngine.tabs.size})") },
+        title = { Text(text = "Tab (${GeckoEngine.tabs.size})") },
         text = {
             LazyColumn(modifier = Modifier.fillMaxWidth().height(320.dp)) {
                 items(GeckoEngine.tabs.toList(), key = { it.id }) { t ->
@@ -336,12 +336,12 @@ private fun TabsDialog(onClose: () -> Unit, onNewTab: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text(
+                            Text(text = 
                                 (if (t.isPrivate) "🕵️ " else "") + t.title.ifBlank { "Tab baru" },
                                 fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
                                 maxLines = 1, overflow = TextOverflow.Ellipsis,
                             )
-                            Text(
+                            Text(text = 
                                 t.url, fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                 maxLines = 1, overflow = TextOverflow.Ellipsis,
@@ -355,9 +355,9 @@ private fun TabsDialog(onClose: () -> Unit, onNewTab: () -> Unit) {
             }
         },
         confirmButton = {
-            TextButton(onClick = onNewTab) { Text("+ Tab baru") }
+            TextButton(onClick = onNewTab) { Text(text = "+ Tab baru") }
         },
-        dismissButton = { TextButton(onClick = onClose) { Text("Tutup") } },
+        dismissButton = { TextButton(onClick = onClose) { Text(text = "Tutup") } },
     )
 }
 
@@ -366,10 +366,10 @@ private fun BookmarksDialog(onClose: () -> Unit) {
     var items by remember { mutableStateOf(GeckoEngine.bookmarks.list()) }
     AlertDialog(
         onDismissRequest = onClose,
-        title = { Text("Bookmark") },
+        title = { Text(text = "Bookmark") },
         text = {
             if (items.isEmpty()) {
-                Text("Belum ada bookmark. Ketuk ikon bintang di bilah alamat untuk menyimpan halaman ini.")
+                Text(text = "Belum ada bookmark. Ketuk ikon bintang di bilah alamat untuk menyimpan halaman ini.")
             } else {
                 LazyColumn(modifier = Modifier.fillMaxWidth().height(320.dp)) {
                     items(items, key = { it.url }) { b ->
@@ -381,8 +381,8 @@ private fun BookmarksDialog(onClose: () -> Unit) {
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Column(Modifier.weight(1f)) {
-                                Text(b.title.ifBlank { b.url }, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                Text(b.url, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(text = b.title.ifBlank { b.url }, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(text = b.url, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                             IconButton(onClick = {
                                 GeckoEngine.bookmarks.remove(b.url)
@@ -393,7 +393,7 @@ private fun BookmarksDialog(onClose: () -> Unit) {
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onClose) { Text("Tutup") } },
+        confirmButton = { TextButton(onClick = onClose) { Text(text = "Tutup") } },
     )
 }
 
@@ -402,10 +402,10 @@ private fun HistoryDialog(onClose: () -> Unit) {
     var items by remember { mutableStateOf(GeckoEngine.history.list()) }
     AlertDialog(
         onDismissRequest = onClose,
-        title = { Text("Riwayat") },
+        title = { Text(text = "Riwayat") },
         text = {
             if (items.isEmpty()) {
-                Text("Riwayat kosong.")
+                Text(text = "Riwayat kosong.")
             } else {
                 LazyColumn(modifier = Modifier.fillMaxWidth().height(320.dp)) {
                     items(items, key = { it.url + it.time }) { h ->
@@ -417,8 +417,8 @@ private fun HistoryDialog(onClose: () -> Unit) {
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Column(Modifier.weight(1f)) {
-                                Text(h.title.ifBlank { h.url }, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                Text(h.url, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(text = h.title.ifBlank { h.url }, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(text = h.url, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                             IconButton(onClick = {
                                 GeckoEngine.history.remove(h.url, h.time)
@@ -433,10 +433,10 @@ private fun HistoryDialog(onClose: () -> Unit) {
             Row {
                 if (items.isNotEmpty()) {
                     TextButton(onClick = { GeckoEngine.history.clear(); items = emptyList() }) {
-                        Text("Hapus semua", color = Color(0xFFF6AEA9))
+                        Text(text = "Hapus semua", color = Color(0xFFF6AEA9))
                     }
                 }
-                TextButton(onClick = onClose) { Text("Tutup") }
+                TextButton(onClick = onClose) { Text(text = "Tutup") }
             }
         },
     )
@@ -453,7 +453,7 @@ private fun ProfileSwitchDialog(
     val profiles = remember { pm.ensureDefault() }
     AlertDialog(
         onDismissRequest = onClose,
-        title = { Text("Ganti profil") },
+        title = { Text(text = "Ganti profil") },
         text = {
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 items(profiles, key = { it.id }) { p ->
@@ -468,9 +468,9 @@ private fun ProfileSwitchDialog(
                             modifier = Modifier.size(40.dp).clip(CircleShape)
                                 .background(Color(p.colorArgb)),
                             contentAlignment = Alignment.Center,
-                        ) { Text(p.icon, fontSize = 20.sp) }
+                        ) { Text(text = p.icon, fontSize = 20.sp) }
                         Spacer(Modifier.width(12.dp))
-                        Text(
+                        Text(text = 
                             p.name + if (p.id == currentId) " (aktif)" else "",
                             fontWeight = if (p.id == currentId) FontWeight.Bold else FontWeight.Normal,
                         )
@@ -478,7 +478,7 @@ private fun ProfileSwitchDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onManage) { Text("Kelola profil") } },
-        dismissButton = { TextButton(onClick = onClose) { Text("Batal") } },
+        confirmButton = { TextButton(onClick = onManage) { Text(text = "Kelola profil") } },
+        dismissButton = { TextButton(onClick = onClose) { Text(text = "Batal") } },
     )
 }
