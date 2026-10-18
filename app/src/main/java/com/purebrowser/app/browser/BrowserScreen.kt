@@ -148,8 +148,8 @@ fun BrowserScreen(
             Box {
                 IconButton(onClick = { showTabs = true }) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text(text = 
-                            "${tabs.size}",
+                        Text(
+                            text = "${tabs.size}",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.background(
@@ -336,13 +336,13 @@ private fun TabsDialog(onClose: () -> Unit, onNewTab: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text(text = 
-                                (if (t.isPrivate) "🕵️ " else "") + t.title.ifBlank { "Tab baru" },
+                            Text(
+                                text = (if (t.isPrivate) "🕵️ " else "") + t.title.ifBlank { "Tab baru" },
                                 fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
                                 maxLines = 1, overflow = TextOverflow.Ellipsis,
                             )
-                            Text(text = 
-                                t.url, fontSize = 12.sp,
+                            Text(
+                                text = t.url, fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                 maxLines = 1, overflow = TextOverflow.Ellipsis,
                             )
@@ -470,8 +470,8 @@ private fun ProfileSwitchDialog(
                             contentAlignment = Alignment.Center,
                         ) { Text(text = p.icon, fontSize = 20.sp) }
                         Spacer(Modifier.width(12.dp))
-                        Text(text = 
-                            p.name + if (p.id == currentId) " (aktif)" else "",
+                        Text(
+                            text = p.name + if (p.id == currentId) " (aktif)" else "",
                             fontWeight = if (p.id == currentId) FontWeight.Bold else FontWeight.Normal,
                         )
                     }
