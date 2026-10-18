@@ -17,15 +17,18 @@ import java.io.File
  *
  * Implementasi orisinal; nativeLibraryDir & sourceDir tetap milik APK asli.
  */
-class ProfileContext(base: Context, profileId: String) : ContextWrapper(base) {
+class ProfileContext(
+    private val baseCtx: Context,
+    private val profileId: String,
+) : ContextWrapper(baseCtx) {
 
-    private val root: File = File(base.filesDir, ProfileManager.profileDirName(profileId))
+    private val root: File = File(baseCtx.filesDir, ProfileManager.profileDirName(profileId))
     private val files: File = File(root, "files")
     private val cache: File = File(root, "cache")
     private val noBackup: File = File(root, "no_backup")
     private val codeCache: File = File(root, "code_cache")
 
-    private val patchedAppInfo: ApplicationInfo = ApplicationInfo(base.applicationInfo).apply {
+    private val patchedAppInfo: ApplicationInfo = ApplicationInfo(baseCtx.applicationInfo).apply {
         dataDir = root.absolutePath
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             deviceProtectedDataDir = root.absolutePath
@@ -61,12 +64,12 @@ class ProfileContext(base: Context, profileId: String) : ContextWrapper(base) {
         File(files, "app_$name").apply { mkdirs() }
 
     override fun getExternalFilesDir(type: String?): File? {
-        val ext = base.getExternalFilesDir(type) ?: return null
+        val ext = baseCtx.getExternalFilesDir(type) ?: return null
         return File(File(ext.parentFile, "profiles/$profileId"), "files").apply { mkdirs() }
     }
 
     override fun getExternalCacheDir(): File? {
-        val ext = base.externalCacheDir ?: return null
+        val ext = baseCtx.externalCacheDir ?: return null
         return File(File(ext.parentFile, "profiles/$profileId"), "cache").apply { mkdirs() }
     }
 }
