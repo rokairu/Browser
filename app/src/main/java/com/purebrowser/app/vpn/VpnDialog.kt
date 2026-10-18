@@ -103,8 +103,8 @@ fun VpnDialog(onClose: () -> Unit) {
         title = { Text(text = "VPN WireGuard") },
         text = {
             Column {
-                Text(text = 
-                    "PureBrowser tidak menyediakan server VPN. Impor berkas .conf dari provider VPN legit pilihanmu (mis. Mullvad, ProtonVPN, IVPN, atau server pribadimu). " +
+                Text(
+                    text = "PureBrowser tidak menyediakan server VPN. Impor berkas .conf dari provider VPN legit pilihanmu (mis. Mullvad, ProtonVPN, IVPN, atau server pribadimu). " +,
                         "Hanya traffic browser ini yang masuk tunnel.",
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
@@ -126,8 +126,8 @@ fun VpnDialog(onClose: () -> Unit) {
                             Column(Modifier.weight(1f)) {
                                 Text(text = "Terhubung: ${active!!.name}", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                                 stats?.let { (rx, tx) ->
-                                    Text(text = 
-                                        "↓ ${formatBytes(rx)}  ↑ ${formatBytes(tx)}",
+                                    Text(
+                                        text = "↓ ${formatBytes(rx)}  ↑ ${formatBytes(tx)}",
                                         fontSize = 12.sp,
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                     )
@@ -154,8 +154,8 @@ fun VpnDialog(onClose: () -> Unit) {
                             ) {
                                 Column(Modifier.weight(1f)) {
                                     Text(text = p.name, fontWeight = FontWeight.SemiBold)
-                                    Text(text = 
-                                        if (isActive) "Terhubung" else "Terputus",
+                                    Text(
+                                        text = if (isActive) "Terhubung" else "Terputus",
                                         fontSize = 12.sp,
                                         color = if (isActive) Color(0xFF81C995)
                                         else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -184,8 +184,8 @@ fun VpnDialog(onClose: () -> Unit) {
                     Text(text = "Impor berkas .conf")
                 }
                 Spacer(Modifier.height(8.dp))
-                Text(text = 
-                    "Kill switch: aktifkan \"Always-on VPN\" + \"Block connections without VPN\" di pengaturan VPN sistem agar traffic tidak bocor saat tunnel putus.",
+                Text(
+                    text = "Kill switch: aktifkan \"Always-on VPN\" + \"Block connections without VPN\" di pengaturan VPN sistem agar traffic tidak bocor saat tunnel putus.",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 )
