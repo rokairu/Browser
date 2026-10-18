@@ -299,7 +299,7 @@ private fun ProfileEditorDialog(
     title: String,
     initial: Profile? = null,
     onDismiss: () -> Unit,
-    onSave: (name: String, color: Int, icon: String) -> Unit,
+    onSave: (name: String, color: Int, icon: String) -> Unit
 ) {
     var name by remember { mutableStateOf(initial?.name ?: "") }
     var color by remember { mutableStateOf(initial?.colorArgb ?: Profile.PALETTE[0]) }
@@ -307,62 +307,79 @@ private fun ProfileEditorDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        confirmButton = {
+            Button(onClick = { onSave(name, color, icon) }) {
+                Text(text = "Simpan")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "Batal")
+            }
+        },
         title = { Text(text = title) },
         text = {
             Column {
                 OutlinedTextField(
-                    value = name, onValueChange = { name = it },
-                    label = { Text(text = "Nama profil") }, singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(text = "Nama profil") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(Modifier.height(12.dp))
-                Text(text = "Warna", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
-                Spacer(Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Warna",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+                Spacer(modifier = Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Profile.PALETTE.forEach { c ->
                         val selected = c == color
+                        val boxSize = if (selected) 36.dp else 30.dp
                         Box(
-                            modifier = Modifier.size(if (selected) 36.dp else 30.dp)
-                                .clip(CircleShape).background(Color(c))
-                                .clickable { color = c },
+                            modifier = Modifier
+                                .size(boxSize)
+                                .clip(CircleShape)
+                                .background(Color(c))
+                                .clickable { color = c }
                         )
                     }
                 }
-                Spacer(Modifier.height(12.dp))
-                Text(text = "Ikon", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
-                Spacer(Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Ikon",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+                Spacer(modifier = Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Profile.ICONS.take(8).forEach { ic ->
+                        val iconSize = if (ic == icon) 28.sp else 22.sp
                         Text(
                             text = ic,
-                            fontSize = if (ic == icon) 28.sp else 22.sp,
-                            modifier = Modifier.clickable { icon = ic }.padding(2.dp),
+                            fontSize = iconSize,
+                            modifier = Modifier
+                                .clickable { icon = ic }
+                                .padding(2.dp)
                         )
                     }
                 }
-                Spacer(Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Profile.ICONS.drop(8).forEach { ic ->
+                        val iconSize = if (ic == icon) 28.sp else 22.sp
                         Text(
                             text = ic,
-                            fontSize = if (ic == icon) 28.sp else 22.sp,
-                            modifier = Modifier.clickable { icon = ic }.padding(2.dp),
+                            fontSize = iconSize,
+                            modifier = Modifier
+                                .clickable { icon = ic }
+                                .padding(2.dp)
                         )
                     }
                 }
             }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onSave(name, color, icon) },
-                content = { Text(text = "Simpan") },
-            )
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-                content = { Text(text = "Batal") },
-            )
-        },
-    }
+        }
+    )
 }
