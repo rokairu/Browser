@@ -53,8 +53,10 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    // Mesin browser mandiri (Gecko/Firefox) — bukan System WebView
-    implementation("org.mozilla.geckoview:geckoview-arm64-v8a:158.0.20261007201254")
+    // Mesin browser mandiri (Gecko/Firefox) — bukan System WebView.
+    // v153 = versi terbaru yang masih kompatibel dengan compileSdk 34
+    // (v154+ butuh compileSdk 37 + AGP 9.x).
+    implementation("org.mozilla.geckoview:geckoview-arm64-v8a:153.0.20260810162159")
     // Klien WireGuard resmi untuk fitur VPN
     implementation("com.wireguard.android:tunnel:1.0.20260102")
 
