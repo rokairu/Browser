@@ -25,7 +25,7 @@ jobs:
           ls "$ANDROID_HOME" | head -20
           if command -v sdkmanager >/dev/null 2>&1; then
             yes | sdkmanager --licenses > /dev/null || true
-            sdkmanager "platforms;android-34" "build-tools;34.0.0" || echo "sdkmanager install issue, continuing with preinstalled SDK"
+            sdkmanager "platforms;android-35" "build-tools;35.0.0" || echo "sdkmanager install issue, continuing with preinstalled SDK"
           else
             echo "sdkmanager not on PATH, relying on preinstalled SDK"
             ls "$ANDROID_HOME/build-tools" || true
