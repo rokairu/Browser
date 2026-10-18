@@ -20,9 +20,17 @@ jobs:
 
       - name: Ensure Android SDK components
         run: |
+          export ANDROID_HOME=${ANDROID_HOME:-$ANDROID_SDK_ROOT}
           echo "ANDROID_HOME=$ANDROID_HOME"
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platforms;android-34" "build-tools;34.0.0"
+          ls "$ANDROID_HOME" | head -20
+          if command -v sdkmanager >/dev/null 2>&1; then
+            yes | sdkmanager --licenses > /dev/null || true
+            sdkmanager "platforms;android-34" "build-tools;34.0.0" || echo "sdkmanager install issue, continuing with preinstalled SDK"
+          else
+            echo "sdkmanager not on PATH, relying on preinstalled SDK"
+            ls "$ANDROID_HOME/build-tools" || true
+            ls "$ANDROID_HOME/platforms" || true
+          fi
 
       - name: Download Gradle 8.7
         run: |
