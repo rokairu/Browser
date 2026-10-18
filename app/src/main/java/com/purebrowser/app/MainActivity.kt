@@ -138,7 +138,7 @@ private fun ProfilePickerScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
+                Text(text = 
                     "PureBrowser",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -164,9 +164,9 @@ private fun ProfilePickerScreen(
                 }
             }
             Spacer(Modifier.height(8.dp))
-            Text("Siapa yang browsing?", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(text = "Siapa yang browsing?", fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
-            Text(
+            Text(text = 
                 "Tiap profil punya cookie, riwayat, bookmark, dan login sendiri.",
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 fontSize = 14.sp,
@@ -218,8 +218,8 @@ private fun ProfilePickerScreen(
     deleteTarget?.let { p ->
         AlertDialog(
             onDismissRequest = { deleteTarget = null },
-            title = { Text("Hapus profil?") },
-            text = { Text("Profil \"${p.name}\" dan seluruh datanya (riwayat, bookmark, login) akan dihapus permanen.") },
+            title = { Text(text = "Hapus profil?") },
+            text = { Text(text = "Profil \"${p.name}\" dan seluruh datanya (riwayat, bookmark, login) akan dihapus permanen.") },
             confirmButton = {
                 TextButton(onClick = {
                     if (pm.delete(p.id)) {
@@ -227,9 +227,9 @@ private fun ProfilePickerScreen(
                         killProfileProcess()
                     }
                     refresh(); deleteTarget = null
-                }) { Text("Hapus", color = Color(0xFFF6AEA9)) }
+                }) { Text(text = "Hapus", color = Color(0xFFF6AEA9)) }
             },
-            dismissButton = { TextButton(onClick = { deleteTarget = null }) { Text("Batal") } },
+            dismissButton = { TextButton(onClick = { deleteTarget = null }) { Text(text = "Batal") } },
         )
     }
 }
@@ -274,12 +274,12 @@ private fun ProfileCard(
                     .background(Color(profile.colorArgb)),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(profile.icon, fontSize = 30.sp)
+                Text(text = profile.icon, fontSize = 30.sp)
             }
             Spacer(Modifier.height(8.dp))
-            Text(profile.name, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Text(text = profile.name, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             if (isActive) {
-                Text("Aktif", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                Text(text = "Aktif", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
             }
             Spacer(Modifier.height(4.dp))
             Row {
@@ -307,16 +307,16 @@ private fun ProfileEditorDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title) },
+        title = { Text(text = title) },
         text = {
             Column {
                 OutlinedTextField(
                     value = name, onValueChange = { name = it },
-                    label = { Text("Nama profil") }, singleLine = true,
+                    label = { Text(text = "Nama profil") }, singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(12.dp))
-                Text("Warna", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                Text(text = "Warna", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Profile.PALETTE.forEach { c ->
@@ -329,11 +329,11 @@ private fun ProfileEditorDialog(
                     }
                 }
                 Spacer(Modifier.height(12.dp))
-                Text("Ikon", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                Text(text = "Ikon", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Profile.ICONS.take(8).forEach { ic ->
-                        Text(
+                        Text(text = 
                             ic, fontSize = if (ic == icon) 28.sp else 22.sp,
                             modifier = Modifier.clickable { icon = ic }.padding(2.dp),
                         )
@@ -342,7 +342,7 @@ private fun ProfileEditorDialog(
                 Spacer(Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Profile.ICONS.drop(8).forEach { ic ->
-                        Text(
+                        Text(text = 
                             ic, fontSize = if (ic == icon) 28.sp else 22.sp,
                             modifier = Modifier.clickable { icon = ic }.padding(2.dp),
                         )
@@ -353,13 +353,13 @@ private fun ProfileEditorDialog(
         confirmButton = {
             Button(
                 onClick = { onSave(name, color, icon) },
-                content = { Text("Simpan") },
+                content = { Text(text = "Simpan") },
             )
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
-                content = { Text("Batal") },
+                content = { Text(text = "Batal") },
             )
         },
     }
