@@ -100,10 +100,10 @@ fun VpnDialog(onClose: () -> Unit) {
 
     AlertDialog(
         onDismissRequest = onClose,
-        title = { Text("VPN WireGuard") },
+        title = { Text(text = "VPN WireGuard") },
         text = {
             Column {
-                Text(
+                Text(text = 
                     "PureBrowser tidak menyediakan server VPN. Impor berkas .conf dari provider VPN legit pilihanmu (mis. Mullvad, ProtonVPN, IVPN, atau server pribadimu). " +
                         "Hanya traffic browser ini yang masuk tunnel.",
                     fontSize = 13.sp,
@@ -124,9 +124,9 @@ fun VpnDialog(onClose: () -> Unit) {
                             Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFF81C995))
                             Spacer(Modifier.padding(4.dp))
                             Column(Modifier.weight(1f)) {
-                                Text("Terhubung: ${active!!.name}", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                                Text(text = "Terhubung: ${active!!.name}", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                                 stats?.let { (rx, tx) ->
-                                    Text(
+                                    Text(text = 
                                         "↓ ${formatBytes(rx)}  ↑ ${formatBytes(tx)}",
                                         fontSize = 12.sp,
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
@@ -138,7 +138,7 @@ fun VpnDialog(onClose: () -> Unit) {
                     Spacer(Modifier.height(8.dp))
                 }
                 (errorMsg ?: vpnError)?.let {
-                    Text(it, color = Color(0xFFF6AEA9), fontSize = 13.sp)
+                    Text(text = it, color = Color(0xFFF6AEA9), fontSize = 13.sp)
                     Spacer(Modifier.height(8.dp))
                 }
                 LazyColumn(
@@ -153,8 +153,8 @@ fun VpnDialog(onClose: () -> Unit) {
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Column(Modifier.weight(1f)) {
-                                    Text(p.name, fontWeight = FontWeight.SemiBold)
-                                    Text(
+                                    Text(text = p.name, fontWeight = FontWeight.SemiBold)
+                                    Text(text = 
                                         if (isActive) "Terhubung" else "Terputus",
                                         fontSize = 12.sp,
                                         color = if (isActive) Color(0xFF81C995)
@@ -162,7 +162,7 @@ fun VpnDialog(onClose: () -> Unit) {
                                     )
                                 }
                                 Button(onClick = { toggle(p) }) {
-                                    Text(if (isActive) "Putus" else "Sambung")
+                                    Text(text = if (isActive) "Putus" else "Sambung")
                                 }
                                 IconButton(onClick = {
                                     if (isActive) VpnController.disconnect(appCtx)
@@ -181,10 +181,10 @@ fun VpnDialog(onClose: () -> Unit) {
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null)
                     Spacer(Modifier.padding(4.dp))
-                    Text("Impor berkas .conf")
+                    Text(text = "Impor berkas .conf")
                 }
                 Spacer(Modifier.height(8.dp))
-                Text(
+                Text(text = 
                     "Kill switch: aktifkan \"Always-on VPN\" + \"Block connections without VPN\" di pengaturan VPN sistem agar traffic tidak bocor saat tunnel putus.",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -193,10 +193,10 @@ fun VpnDialog(onClose: () -> Unit) {
                     appCtx.startActivity(
                         Intent(Settings.ACTION_VPN_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     )
-                }) { Text("Buka pengaturan VPN sistem") }
+                }) { Text(text = "Buka pengaturan VPN sistem") }
             }
         },
-        confirmButton = { TextButton(onClick = onClose) { Text("Tutup") } },
+        confirmButton = { TextButton(onClick = onClose) { Text(text = "Tutup") } },
     )
 }
 
