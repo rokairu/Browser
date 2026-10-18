@@ -32,11 +32,11 @@ jobs:
             ls "$ANDROID_HOME/platforms" || true
           fi
 
-      - name: Download Gradle 8.7
+      - name: Download Gradle 8.11.1
         run: |
-          curl -sL https://services.gradle.org/distributions/gradle-8.7-bin.zip -o /tmp/gradle.zip
+          curl -sL https://services.gradle.org/distributions/gradle-8.11.1-bin.zip -o /tmp/gradle.zip
           unzip -q /tmp/gradle.zip -d /tmp
-          echo "/tmp/gradle-8.7/bin" >> $GITHUB_PATH
+          echo "/tmp/gradle-8.11.1/bin" >> $GITHUB_PATH
 
       - name: Build debug APK
         run: |
