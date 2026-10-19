@@ -25,4 +25,10 @@ class Tab(
      * ada navigasi nyata via onLocationChange.
      */
     var isNewTabPage by mutableStateOf(initialUrl == null)
+    /**
+     * URL yang menunggu dimuat SETELAH session ditempel ke GeckoView.
+     * Perbaikan bug: loadUri() tidak boleh dipanggil sebelum session attached
+     * ke view, karena halaman jadi blank.
+     */
+    var pendingUrl by mutableStateOf<String?>(initialUrl)
 }
