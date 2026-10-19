@@ -19,4 +19,10 @@ class Tab(
     var canGoBack by mutableStateOf(false)
     var canGoForward by mutableStateOf(false)
     var progress by mutableStateOf(0)
+    /**
+     * True jika tab menampilkan halaman tab baru (NewTabScreen, native Compose)
+     * dan belum pernah dinavigasikan ke URL web. Otomatis false begitu
+     * ada navigasi nyata via onLocationChange.
+     */
+    var isNewTabPage by mutableStateOf(initialUrl == null)
 }
