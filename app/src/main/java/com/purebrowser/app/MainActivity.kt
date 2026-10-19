@@ -70,7 +70,23 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pm = ProfileManager(applicationContext)
-        render(autoVpn = intent.getBooleanExtra(EXTRA_AUTO_VPN, false))
+
+        // Buka langsung ke browser kecuali diminta kelola profil secara eksplisit.
+        // (Dari menu browser: "Ganti profil" -> "Kelola profil".)
+        val manageProfiles = intent.getBooleanExtra(EXTRA_MANAGE_PROFILES, false)
+        val autoVpn = intent.getBooleanExtra(EXTRA_AUTO_VPN, false)
+        if (!manageProfiles && !autoVpn) {
+            val profiles = pm.ensureDefault()
+            val targetId = pm.activeProfileId() ?: profiles.first().id
+            pm.setActiveProfileId(targetId)
+            val i = Intent(this, BrowserActivity::class.java).apply {
+                putExtra(BrowserActivity.EXTRA_PROFILE_ID, targetId)
+            }
+            startActivity(i)
+            finish()
+            return
+        }
+        render(autoVpn = autoVpn)
     }
 
     override fun onResume() {
@@ -105,6 +121,7 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_AUTO_VPN = "auto_vpn"
+        const val EXTRA_MANAGE_PROFILES = "manage_profiles"
     }
 }
 
@@ -274,7 +291,12 @@ private fun ProfileCard(
                     .background(Color(profile.colorArgb)),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = profile.icon, fontSize = 30.sp)
+                Icon(
+                    com.purebrowser.app.profile.ProfileIcons.resolve(profile.icon),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(32.dp),
+                )
             }
             Spacer(Modifier.height(8.dp))
             Text(text = profile.name, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
@@ -355,28 +377,46 @@ private fun ProfileEditorDialog(
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Profile.ICONS.take(8).forEach { ic ->
-                        val iconSize = if (ic == icon) 28.sp else 22.sp
-                        Text(
-                            text = ic,
-                            fontSize = iconSize,
-                            modifier = Modifier
-                                .clickable { icon = ic }
-                                .padding(2.dp)
-                        )
+                    Profile.ICONS.take(7).forEach { ic ->
+                        val selected = ic == icon
+                        val bgColor = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                            else Color.Transparent
+                        Box(
+                            modifier = Modifier.size(40.dp).clip(CircleShape)
+                                .background(bgColor)
+                                .clickable { icon = ic },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                com.purebrowser.app.profile.ProfileIcons.resolve(ic),
+                                contentDescription = null,
+                                tint = if (selected) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                modifier = Modifier.size(24.dp),
+                            )
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Profile.ICONS.drop(8).forEach { ic ->
-                        val iconSize = if (ic == icon) 28.sp else 22.sp
-                        Text(
-                            text = ic,
-                            fontSize = iconSize,
-                            modifier = Modifier
-                                .clickable { icon = ic }
-                                .padding(2.dp)
-                        )
+                    Profile.ICONS.drop(7).forEach { ic ->
+                        val selected = ic == icon
+                        val bgColor = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                            else Color.Transparent
+                        Box(
+                            modifier = Modifier.size(40.dp).clip(CircleShape)
+                                .background(bgColor)
+                                .clickable { icon = ic },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                com.purebrowser.app.profile.ProfileIcons.resolve(ic),
+                                contentDescription = null,
+                                tint = if (selected) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                modifier = Modifier.size(24.dp),
+                            )
+                        }
                     }
                 }
             }
