@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -100,7 +101,7 @@ fun BrowserScreen(
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         // ---- Bilah atas ----
         Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Chip profil ala Chrome desktop
@@ -114,7 +115,14 @@ fun BrowserScreen(
                     modifier = Modifier.size(32.dp).clip(CircleShape)
                         .background(Color(profile.colorArgb)),
                     contentAlignment = Alignment.Center,
-                ) { Text(text = profile.icon, fontSize = 18.sp) }
+                ) {
+                    Icon(
+                        com.purebrowser.app.profile.ProfileIcons.resolve(profile.icon),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
             }
             IconButton(
                 onClick = { tab?.session?.goBack() },
@@ -350,11 +358,22 @@ private fun TabsDialog(onClose: () -> Unit, onNewTab: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text(
-                                text = (if (t.isPrivate) "🕵️ " else "") + t.title.ifBlank { "Tab baru" },
-                                fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
-                                maxLines = 1, overflow = TextOverflow.Ellipsis,
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (t.isPrivate) {
+                                    Icon(
+                                        Icons.Default.Lock,
+                                        contentDescription = "Tab privat",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(14.dp),
+                                    )
+                                    Spacer(Modifier.width(4.dp))
+                                }
+                                Text(
+                                    text = t.title.ifBlank { "Tab baru" },
+                                    fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
+                                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                )
+                            }
                             Text(
                                 text = t.url, fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
