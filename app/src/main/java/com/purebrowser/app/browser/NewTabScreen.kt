@@ -99,8 +99,10 @@ fun NewTabScreen(tab: Tab) {
     fun navigate(target: String) {
         val url = normalizeInput(target.ifBlank { return })
         if (url.isBlank()) return
+        // Set pendingUrl dan isNewTabPage=false; BrowserScreen akan memuat
+        // URL setelah session ditempel ke GeckoView (perbaikan bug blank).
+        tab.pendingUrl = url
         tab.isNewTabPage = false
-        tab.session.loadUri(url)
         focusManager.clearFocus()
     }
 
