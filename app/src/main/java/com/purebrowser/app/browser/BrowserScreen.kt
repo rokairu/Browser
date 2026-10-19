@@ -262,7 +262,15 @@ fun BrowserScreen(
             } else {
                 AndroidView(
                     factory = { geckoView },
-                    update = { view -> view.setSession(tab.session) },
+                    update = { view ->
+                        view.setSession(tab.session)
+                        // Muat URL yang tertunda SETELAH session ditempel ke view.
+                        // Ini perbaikan bug halaman blank.
+                        tab.pendingUrl?.let { url ->
+                            tab.pendingUrl = null
+                            tab.session.loadUri(url)
+                        }
+                    },
                     modifier = Modifier.fillMaxSize().weight(1f),
                 )
             }
@@ -330,7 +338,7 @@ private fun AddressBar(tab: Tab?, modifier: Modifier = Modifier) {
             val target = normalizeInput(input)
             if (target.isNotBlank()) {
                 val t = tab ?: GeckoEngine.newTab()
-                t.session.loadUri(target)
+                GeckoEngine.loadUrl(t, target)
             }
             focusManager.clearFocus()
         }),
@@ -424,7 +432,8 @@ private fun BookmarksDialog(onClose: () -> Unit) {
                     items(items, key = { it.url }) { b ->
                         Row(
                             modifier = Modifier.fillMaxWidth().clickable {
-                                GeckoEngine.activeTab?.session?.loadUri(b.url) ?: GeckoEngine.newTab(b.url)
+                                val t = GeckoEngine.activeTab ?: GeckoEngine.newTab()
+                                GeckoEngine.loadUrl(t, b.url)
                                 onClose()
                             }.padding(vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -460,7 +469,8 @@ private fun HistoryDialog(onClose: () -> Unit) {
                     items(items, key = { it.url + it.time }) { h ->
                         Row(
                             modifier = Modifier.fillMaxWidth().clickable {
-                                GeckoEngine.activeTab?.session?.loadUri(h.url) ?: GeckoEngine.newTab(h.url)
+                                val t = GeckoEngine.activeTab ?: GeckoEngine.newTab()
+                                GeckoEngine.loadUrl(t, h.url)
                                 onClose()
                             }.padding(vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
