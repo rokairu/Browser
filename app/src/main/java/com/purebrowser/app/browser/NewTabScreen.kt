@@ -96,6 +96,14 @@ fun NewTabScreen(tab: Tab) {
     var engine by remember { mutableStateOf(SearchEngine.DUCKDUCKGO) }
     var engineMenuOpen by remember { mutableStateOf(false) }
 
+    fun navigate(target: String) {
+        val url = normalizeInput(target.ifBlank { return })
+        if (url.isBlank()) return
+        tab.isNewTabPage = false
+        tab.session.loadUri(url)
+        focusManager.clearFocus()
+    }
+
     fun doSearch() {
         val q = query.trim()
         if (q.isBlank()) return
@@ -103,14 +111,6 @@ fun NewTabScreen(tab: Tab) {
             (q.contains(".") || q.contains("://") || q.contains("/"))
         if (looksLikeUrl) navigate(q)
         else navigate(engine.searchUrl + URLEncoder.encode(q, "UTF-8"))
-    }
-
-    fun navigate(target: String) {
-        val url = normalizeInput(target.ifBlank { return })
-        if (url.isBlank()) return
-        tab.isNewTabPage = false
-        tab.session.loadUri(url)
-        focusManager.clearFocus()
     }
 
     Column(
