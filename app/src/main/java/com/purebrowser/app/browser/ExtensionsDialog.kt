@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Extension
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -162,6 +163,7 @@ fun ExtensionsDialog(onClose: () -> Unit) {
                     items(extensions, key = { it.id }) { ext ->
                         val meta = ext.metaData
                         val enabled = meta?.enabled != false
+                        val hasOptions = !meta?.optionsPageUrl.isNullOrBlank()
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -178,6 +180,20 @@ fun ExtensionsDialog(onClose: () -> Unit) {
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                     maxLines = 2, overflow = TextOverflow.Ellipsis,
                                 )
+                            }
+                            // Tombol buka halaman pengaturan ekstensi (jika ada).
+                            if (hasOptions) {
+                                IconButton(onClick = {
+                                    val url = meta?.optionsPageUrl ?: return@IconButton
+                                    GeckoEngine.newTab(url)
+                                    onClose()
+                                }) {
+                                    Icon(
+                                        Icons.Default.Settings,
+                                        contentDescription = "Pengaturan ekstensi",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                    )
+                                }
                             }
                             Switch(
                                 checked = enabled,
