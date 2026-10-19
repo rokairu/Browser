@@ -73,8 +73,12 @@ fun ExtensionsDialog(onClose: () -> Unit) {
     val isBusy = ExtensionManager.isBusy
     val lastError = ExtensionManager.lastError
     var confirmUninstall by remember { mutableStateOf<WebExtension?>(null) }
+    var copyError by remember { mutableStateOf<String?>(null) }
+    // Gabungkan error dari copy file dan dari ExtensionManager.
+    val displayError = copyError ?: lastError
 
     // Pemilih file .xpi — disalin ke penyimpanan privat sebelum install.
+    // File sementara dihapus otomatis oleh ExtensionManager setelah install.
     val pickXpi = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
@@ -82,13 +86,19 @@ fun ExtensionsDialog(onClose: () -> Unit) {
             try {
                 val dir = File(context.filesDir, "extensions").apply { mkdirs() }
                 val dest = File(dir, "ext-${System.currentTimeMillis()}.xpi")
-                context.contentResolver.openInputStream(uri)?.use { input ->
-                    dest.outputStream().use { output -> input.copyTo(output) }
+                val input = context.contentResolver.openInputStream(uri)
+                    ?: throw java.io.IOException("Tidak bisa membaca file yang dipilih")
+                input.use { ins ->
+                    dest.outputStream().use { out -> ins.copyTo(out) }
+                }
+                if (dest.length() == 0L) {
+                    dest.delete()
+                    throw java.io.IOException("File kosong atau gagal disalin")
                 }
                 ExtensionManager.installFromFile(dest)
             } catch (e: Exception) {
-                // lastError di-set via ExtensionManager? Tidak — set manual lewat refresh gagal.
-                // Untuk v1: biarkan, installFromFile menangani file yang ada.
+                // Tampilkan error langsung via state lokal dialog.
+                copyError = "Gagal menyiapkan file: ${e.message ?: "kesalahan tidak diketahui"}"
             }
         }
     }
@@ -103,14 +113,18 @@ fun ExtensionsDialog(onClose: () -> Unit) {
         title = { Text(text = "Ekstensi (${extensions.size})") },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
-                if (lastError != null) {
+                if (displayError != null) {
                     Text(
-                        text = lastError,
+                        text = displayError!! + "\n\n(Ketuk untuk menutup)",
                         fontSize = 13.sp,
                         color = Color(0xFFF6AEA9),
                         modifier = Modifier.fillMaxWidth()
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color(0xFF5A1F1A).copy(alpha = 0.4f))
+                            .clickable {
+                                copyError = null
+                                ExtensionManager.clearError()
+                            }
                             .padding(10.dp),
                     )
                     Spacer(Modifier.height(8.dp))
