@@ -113,8 +113,10 @@ object GeckoEngine {
                 perms: MutableList<GeckoSession.PermissionDelegate.ContentPermission>,
                 hasUserGesture: Boolean,
             ) {
-                if (url != null) {
+                // Abaikan about:blank (status awal session) agar tidak menimpa URL/tab baru.
+                if (url != null && url != "about:blank") {
                     tab.url = url
+                    tab.isNewTabPage = false
                     if (!tab.isPrivate) {
                         try { history.record(url, tab.title) } catch (_: Exception) { }
                     }
