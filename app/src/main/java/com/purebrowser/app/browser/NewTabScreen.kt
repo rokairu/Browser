@@ -13,9 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -99,6 +98,7 @@ fun NewTabScreen(tab: Tab) {
     Column(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -208,39 +208,48 @@ fun NewTabScreen(tab: Tab) {
             textAlign = TextAlign.Start,
         )
         Spacer(Modifier.height(12.dp))
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
+        // Grid 3x2 manual (bukan Lazy) agar bisa di dalam Column scrollable.
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            items(DEFAULT_SHORTCUTS) { s ->
-                Column(
-                    modifier = Modifier.clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .clickable { navigate(s.url) }
-                        .padding(vertical = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+            DEFAULT_SHORTCUTS.chunked(3).forEach { rowItems ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Icon(
-                        s.icon,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(32.dp),
-                    )
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        text = s.name, fontSize = 12.sp,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis,
-                    )
+                    rowItems.forEach { s ->
+                        Column(
+                            modifier = Modifier.weight(1f)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .clickable { navigate(s.url) }
+                                .padding(vertical = 16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Icon(
+                                s.icon,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(32.dp),
+                            )
+                            Spacer(Modifier.height(6.dp))
+                            Text(
+                                text = s.name, fontSize = 12.sp,
+                                maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
+                    // Isi sel kosong jika baris tidak penuh.
+                    repeat(3 - rowItems.size) { Spacer(Modifier.weight(1f)) }
                 }
             }
         }
 
         Spacer(Modifier.height(24.dp))
 
-        // Terakhir dikunjungi
-        val recent = remember { GeckoEngine.history.list().take(5) }
+        // Terakhir dikunjungi — refresh tiap tab berganti (key = tab.id).
+        val recent = remember(tab.id) { GeckoEngine.history.list().take(5) }
         if (recent.isNotEmpty()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
