@@ -31,7 +31,7 @@ class ProfileManager(private val appContext: Context) {
     fun ensureDefault(): List<Profile> {
         val existing = list()
         if (existing.isNotEmpty()) return existing
-        val def = Profile(name = "Pribadi", colorArgb = Profile.PALETTE[0], icon = "🌐")
+        val def = Profile(name = "Pribadi", colorArgb = Profile.PALETTE[0], icon = ProfileIcons.DEFAULT_KEY)
         save(listOf(def))
         setActiveProfileId(def.id)
         return listOf(def)
