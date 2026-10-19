@@ -10,10 +10,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.purebrowser.app.profile.ProfileRuntime
 import org.mozilla.geckoview.ContentBlocking
+import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoRuntime
 import org.mozilla.geckoview.GeckoRuntimeSettings
 import org.mozilla.geckoview.GeckoSession
 import org.mozilla.geckoview.GeckoSessionSettings
+import org.mozilla.geckoview.WebRequestError
 import org.mozilla.geckoview.WebResponse
 
 /**
@@ -78,24 +80,15 @@ object GeckoEngine {
     }
 
     /**
-     * Muat URL di tab dengan benar:
-     * - Jika tab masih halaman tab baru: set pendingUrl, biarkan BrowserScreen
-     *   memuat setelah session ditempel ke view (hindari bug blank).
-     * - Jika tab sudah web biasa: loadUri langsung (session sudah attached).
+     * Muat URL di tab. Session SELALU attached karena GeckoView kini selalu
+     * di-composition (lihat BrowserScreen), jadi loadUri langsung aman —
+     * tanpa perantara pendingUrl yang terbukti rapuh (bug blank v1.3/v1.4).
      */
     fun loadUrl(tab: Tab, url: String) {
-        if (tab.isNewTabPage) {
-            tab.pendingUrl = url
-            tab.isNewTabPage = false
-        } else {
-            // Session sudah attached ke view — aman load langsung.
-            // Tapi jika pendingUrl masih ada (belum dimuat), gabungkan.
-            if (tab.pendingUrl != null) {
-                tab.pendingUrl = url
-            } else {
-                tab.session.loadUri(url)
-            }
-        }
+        tab.isNewTabPage = false
+        tab.loadError = null
+        android.util.Log.d("PureBrowser", "loadUrl: $url")
+        tab.session.loadUri(url)
     }
 
     fun closeTab(id: String) {
@@ -138,14 +131,32 @@ object GeckoEngine {
                 perms: MutableList<GeckoSession.PermissionDelegate.ContentPermission>,
                 hasUserGesture: Boolean,
             ) {
+                android.util.Log.d("PureBrowser", "onLocationChange: $url")
                 // Abaikan about:blank (status awal session) agar tidak menimpa URL/tab baru.
                 if (url != null && url != "about:blank") {
                     tab.url = url
                     tab.isNewTabPage = false
+                    tab.loadError = null
                     if (!tab.isPrivate) {
                         try { history.record(url, tab.title) } catch (_: Exception) { }
                     }
                 }
+            }
+            override fun onLoadError(
+                session: GeckoSession,
+                uri: String?,
+                error: WebRequestError,
+            ): GeckoResult<String>? {
+                // Sebelumnya tidak di-override sehingga kegagalan = blank putih
+                // diam-diam. Kini dicatat dan GeckoView menampilkan halaman
+                // error bawaannya (return null).
+                android.util.Log.e(
+                    "PureBrowser",
+                    "onLoadError: uri=$uri category=${error.category} code=${error.code}",
+                )
+                tab.loadError = "${error.category} (${error.code})"
+                tab.isLoading = false
+                return null
             }
             override fun onCanGoBack(session: GeckoSession, canGoBack: Boolean) {
                 tab.canGoBack = canGoBack
@@ -156,7 +167,9 @@ object GeckoEngine {
         }
         session.progressDelegate = object : GeckoSession.ProgressDelegate {
             override fun onPageStart(session: GeckoSession, url: String) {
+                android.util.Log.d("PureBrowser", "onPageStart: $url")
                 tab.isLoading = true
+                tab.loadError = null
             }
             override fun onPageStop(session: GeckoSession, success: Boolean) {
                 tab.isLoading = false
