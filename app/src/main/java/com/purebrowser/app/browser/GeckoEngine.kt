@@ -51,6 +51,7 @@ object GeckoEngine {
             .javaScriptEnabled(true)
             .build()
         runtime = GeckoRuntime.create(profileCtx, settings)
+        ExtensionManager.init(requireNotNull(runtime))
     }
 
     fun newTab(url: String? = null, isPrivate: Boolean = false, select: Boolean = true): Tab {
@@ -71,6 +72,8 @@ object GeckoEngine {
     fun selectTab(id: String) {
         tabs.forEach { it.session.setActive(it.id == id) }
         activeTabId = id
+        // Beri tahu ekstensi tentang tab aktif (API tabs.*).
+        tabs.find { it.id == id }?.let { ExtensionManager.setTabActive(it.session) }
     }
 
     fun closeTab(id: String) {
