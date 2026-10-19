@@ -368,7 +368,8 @@ internal fun normalizeInput(raw: String): String {
     if (t.startsWith("about:")) return t
     val looksLikeUrl = !t.contains(" ") && (t.contains(".") || t.contains("://") || t.contains("/"))
     if (!looksLikeUrl) {
-        return "https://duckduckgo.com/?q=" + URLEncoder.encode(t, "UTF-8")
+        // Google sebagai fallback: paling kompatibel di semua perangkat.
+        return "https://www.google.com/search?q=" + URLEncoder.encode(t, "UTF-8")
     }
     return if (t.contains("://")) t else "https://$t"
 }
