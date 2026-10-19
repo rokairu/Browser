@@ -27,7 +27,8 @@ data class Profile(
             id = o.getString("id"),
             name = o.getString("name"),
             colorArgb = o.getInt("colorArgb"),
-            icon = o.optString("icon", "🌐"),
+            // Normalisasi: emoji lama otomatis dipetakan ke key ikon baru.
+            icon = ProfileIcons.normalize(o.optString("icon", ProfileIcons.DEFAULT_KEY)),
             createdAt = o.optLong("createdAt", 0L),
         )
 
@@ -42,6 +43,7 @@ data class Profile(
             0xFFFFB287.toInt(), // oranye
             0xFF9AA0A6.toInt(), // abu-abu
         )
-        val ICONS = listOf("🌐", "💼", "🎮", "📚", "🛒", "🎬", "💬", "🔒", "🚀", "🌙", "☕", "🎧")
+        /** Key ikon (lihat ProfileIcons.OPTIONS). Disimpan sebagai string di JSON. */
+        val ICONS = ProfileIcons.OPTIONS.map { it.first }
     }
 }
