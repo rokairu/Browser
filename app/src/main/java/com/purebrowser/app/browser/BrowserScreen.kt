@@ -501,7 +501,14 @@ private fun ProfileSwitchDialog(
                             modifier = Modifier.size(40.dp).clip(CircleShape)
                                 .background(Color(p.colorArgb)),
                             contentAlignment = Alignment.Center,
-                        ) { Text(text = p.icon, fontSize = 20.sp) }
+                        ) {
+                            Icon(
+                                com.purebrowser.app.profile.ProfileIcons.resolve(p.icon),
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(22.dp),
+                            )
+                        }
                         Spacer(Modifier.width(12.dp))
                         Text(
                             text = p.name + if (p.id == currentId) " (aktif)" else "",
