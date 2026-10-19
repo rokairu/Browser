@@ -65,7 +65,16 @@ enum class SearchEngine(val label: String, val searchUrl: String) {
     BING("Bing", "https://www.bing.com/search?q="),
 }
 
-private data class Shortcut(val name: String, val url: String, val icon: ImageVector)
+private data class Shortcut(val name: String, val url: String, val fallbackIcon: ImageVector) {
+    /** URL favicon via layanan gratis Google S2. */
+    val faviconUrl: String
+        get() {
+            val domain = try {
+                java.net.URI(url).host?.removePrefix("www.")?.removePrefix("m.") ?: url
+            } catch (_: Exception) { url }
+            return "https://www.google.com/s2/favicons?domain=$domain&sz=128"
+        }
+}
 
 private val DEFAULT_SHORTCUTS = listOf(
     Shortcut("Google", "https://www.google.com", Icons.Filled.Search),
@@ -86,6 +95,15 @@ fun NewTabScreen(tab: Tab) {
     var query by remember { mutableStateOf("") }
     var engine by remember { mutableStateOf(SearchEngine.DUCKDUCKGO) }
     var engineMenuOpen by remember { mutableStateOf(false) }
+
+    fun doSearch() {
+        val q = query.trim()
+        if (q.isBlank()) return
+        val looksLikeUrl = !q.contains(" ") &&
+            (q.contains(".") || q.contains("://") || q.contains("/"))
+        if (looksLikeUrl) navigate(q)
+        else navigate(engine.searchUrl + URLEncoder.encode(q, "UTF-8"))
+    }
 
     fun navigate(target: String) {
         val url = normalizeInput(target.ifBlank { return })
@@ -153,15 +171,7 @@ fun NewTabScreen(tab: Tab) {
                 placeholder = { Text(text = "Telusuri atau ketik alamat web", fontSize = 15.sp) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = {
-                    val q = query.trim()
-                    if (q.isNotBlank()) {
-                        val looksLikeUrl = !q.contains(" ") &&
-                            (q.contains(".") || q.contains("://") || q.contains("/"))
-                        if (looksLikeUrl) navigate(q)
-                        else navigate(engine.searchUrl + URLEncoder.encode(q, "UTF-8"))
-                    }
-                }),
+                keyboardActions = KeyboardActions(onSearch = { doSearch() }),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
@@ -170,6 +180,14 @@ fun NewTabScreen(tab: Tab) {
                 ),
                 textStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
             )
+            // Tombol cari eksplisit (jangan hanya andalkan tombol keyboard).
+            IconButton(onClick = { doSearch() }) {
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = "Cari",
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
             // Pemilih mesin pencari — ikon saja agar tidak kepotong
             Box {
                 IconButton(onClick = { engineMenuOpen = true }) {
@@ -227,11 +245,13 @@ fun NewTabScreen(tab: Tab) {
                                 .padding(vertical = 16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
-                            Icon(
-                                s.icon,
+                            // Favicon asli situs, fallback ke ikon Material jika gagal.
+                            coil.compose.AsyncImage(
+                                model = s.faviconUrl,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(32.dp),
+                                modifier = Modifier.size(32.dp).clip(RoundedCornerShape(8.dp)),
+                                error = androidx.compose.ui.graphics.vector.rememberVectorPainter(s.fallbackIcon),
+                                placeholder = androidx.compose.ui.graphics.vector.rememberVectorPainter(s.fallbackIcon),
                             )
                             Spacer(Modifier.height(6.dp))
                             Text(
