@@ -166,12 +166,12 @@ fun BrowserScreen(
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                     DropdownMenuItem(
                         text = { Text(text = "Tab baru") },
-                        onClick = { menuOpen = false; GeckoEngine.newTab(BrowserActivity.HOME_URL) },
+                        onClick = { menuOpen = false; GeckoEngine.newTab() },
                         leadingIcon = { Icon(Icons.Default.Add, null) },
                     )
                     DropdownMenuItem(
                         text = { Text(text = "Tab privat baru") },
-                        onClick = { menuOpen = false; GeckoEngine.newTab(BrowserActivity.HOME_URL, isPrivate = true) },
+                        onClick = { menuOpen = false; GeckoEngine.newTab(isPrivate = true) },
                         leadingIcon = { Icon(Icons.Default.Lock, null) },
                     )
                     DropdownMenuItem(
@@ -227,13 +227,17 @@ fun BrowserScreen(
             )
         }
 
-        // ---- Area web ----
+        // ---- Area web / halaman tab baru ----
         if (tab != null) {
-            AndroidView(
-                factory = { geckoView },
-                update = { view -> view.setSession(tab.session) },
-                modifier = Modifier.fillMaxSize().weight(1f),
-            )
+            if (tab.isNewTabPage) {
+                NewTabScreen(tab = tab)
+            } else {
+                AndroidView(
+                    factory = { geckoView },
+                    update = { view -> view.setSession(tab.session) },
+                    modifier = Modifier.fillMaxSize().weight(1f),
+                )
+            }
         } else {
             Box(Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {
                 Text(text = "Tidak ada tab — buka tab baru dari menu", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
@@ -245,7 +249,7 @@ fun BrowserScreen(
     if (showTabs) {
         TabsDialog(
             onClose = { showTabs = false },
-            onNewTab = { GeckoEngine.newTab(BrowserActivity.HOME_URL); showTabs = false },
+            onNewTab = { GeckoEngine.newTab(); showTabs = false },
         )
     }
     if (showBookmarks) {
@@ -304,7 +308,7 @@ private fun AddressBar(tab: Tab?, modifier: Modifier = Modifier) {
     )
 }
 
-private fun normalizeInput(raw: String): String {
+internal fun normalizeInput(raw: String): String {
     val t = raw.trim()
     if (t.isEmpty()) return ""
     if (t.startsWith("about:")) return t
