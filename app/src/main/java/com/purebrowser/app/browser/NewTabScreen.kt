@@ -99,10 +99,13 @@ fun NewTabScreen(tab: Tab) {
     fun navigate(target: String) {
         val url = normalizeInput(target.ifBlank { return })
         if (url.isBlank()) return
-        // Set pendingUrl dan isNewTabPage=false; BrowserScreen akan memuat
-        // URL setelah session ditempel ke GeckoView (perbaikan bug blank).
-        tab.pendingUrl = url
+        // Session SELALU attached (GeckoView selalu di-composition, NTP hanya
+        // overlay), jadi loadUri langsung aman — tanpa pendingUrl (bug blank
+        // v1.3/v1.4 berasal dari pola kondisional yang rapuh).
         tab.isNewTabPage = false
+        tab.loadError = null
+        android.util.Log.d("PureBrowser", "navigate: $url")
+        tab.session.loadUri(url)
         focusManager.clearFocus()
     }
 
