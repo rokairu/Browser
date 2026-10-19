@@ -24,15 +24,20 @@ class BrowserActivity : ComponentActivity() {
 
         val pm = ProfileManager(applicationContext)
         val profiles = pm.ensureDefault()
-        val targetId = intent.getStringExtra(EXTRA_PROFILE_ID)
+        val requestedId = intent.getStringExtra(EXTRA_PROFILE_ID)
             ?: pm.activeProfileId()
             ?: profiles.first().id
-        require(pm.get(targetId) != null) { "Profil tidak ditemukan" }
+        // Fallback lunak: jika profil yang diminta hilang (mis. dihapus),
+        // pakai profil pertama daripada crash.
+        val targetId = if (pm.get(requestedId) != null) requestedId else profiles.first().id
 
         ProfileRuntime.commit(targetId)
         pm.setActiveProfileId(targetId)
 
-        val profileCtx = ProfileContext(this, targetId)
+        // ProfileContext dibungkus di atas applicationContext (bukan Activity)
+        // agar GeckoEngine tidak menahan referensi Activity yang sudah destroyed
+        // saat recreate (rotasi/ganti tema) — mencegah memory leak.
+        val profileCtx = ProfileContext(applicationContext, targetId)
         GeckoEngine.init(profileCtx)
         if (GeckoEngine.tabs.isEmpty()) {
             if (!GeckoEngine.restoreTabs(this)) {
