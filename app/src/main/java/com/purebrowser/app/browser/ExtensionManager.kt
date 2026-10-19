@@ -59,7 +59,7 @@ object ExtensionManager {
             override fun onEnabled(extension: WebExtension) { refresh() }
             override fun onDisabled(extension: WebExtension) { refresh() }
             override fun onInstallationFailed(
-                extension: WebExtension,
+                extension: WebExtension?,
                 exception: WebExtension.InstallException,
             ) {
                 isBusy = false
@@ -84,9 +84,9 @@ object ExtensionManager {
                 extensions.clear()
                 // Tampilkan yang bukan built-in sistem saja tidak perlu;
                 // tampilkan semua apa adanya.
-                extensions.addAll(list.sortedBy { it.metaData?.name ?: it.id })
+                extensions.addAll((list ?: emptyList()).sortedBy { it.metaData?.name ?: it.id })
             },
-            { err -> lastError = err.message ?: "Gagal memuat daftar ekstensi" },
+            { err -> lastError = err?.message ?: "Gagal memuat daftar ekstensi" },
         )
     }
 
@@ -136,10 +136,12 @@ object ExtensionManager {
         // WebExtension immutable: enable/disable mengembalikan instance baru.
         result.accept(
             { updated ->
-                val i = extensions.indexOfFirst { it.id == updated.id }
-                if (i >= 0) extensions[i] = updated else refresh()
+                if (updated != null) {
+                    val i = extensions.indexOfFirst { it.id == updated.id }
+                    if (i >= 0) extensions[i] = updated else refresh()
+                } else refresh()
             },
-            { err -> lastError = err.message ?: "Gagal mengubah status ekstensi" },
+            { err -> lastError = err?.message ?: "Gagal mengubah status ekstensi" },
         )
     }
 
@@ -148,7 +150,7 @@ object ExtensionManager {
         lastError = null
         c.uninstall(extension).accept(
             { refresh() },
-            { err -> lastError = err.message ?: "Gagal menghapus ekstensi" },
+            { err -> lastError = err?.message ?: "Gagal menghapus ekstensi" },
         )
     }
 
@@ -159,7 +161,8 @@ object ExtensionManager {
 
     fun clearError() { lastError = null }
 
-    private fun describeInstallError(err: Throwable): String {
+    private fun describeInstallError(err: Throwable?): String {
+        if (err == null) return "Gagal memasang ekstensi (kesalahan tidak diketahui)"
         val ie = err as? WebExtension.InstallException
         return when (ie?.code) {
             WebExtension.InstallException.ErrorCodes.ERROR_SIGNEDSTATE_REQUIRED ->
