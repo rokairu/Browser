@@ -27,8 +27,13 @@ class Tab(
     var isNewTabPage by mutableStateOf(initialUrl == null)
     /**
      * URL yang menunggu dimuat SETELAH session ditempel ke GeckoView.
-     * Perbaikan bug: loadUri() tidak boleh dipanggil sebelum session attached
-     * ke view, karena halaman jadi blank.
+     * Dipakai untuk newTab(url) — navigasi normal memakai loadUri langsung
+     * karena GeckoView kini selalu di-composition (session selalu attached).
      */
     var pendingUrl by mutableStateOf<String?>(initialUrl)
+    /**
+     * Pesan error pemuatan terakhir dari onLoadError (mis. "NS_ERROR_UNKNOWN_HOST").
+     * null jika tidak ada error. Dipakai agar kegagalan tidak blank diam-diam.
+     */
+    var loadError by mutableStateOf<String?>(null)
 }
