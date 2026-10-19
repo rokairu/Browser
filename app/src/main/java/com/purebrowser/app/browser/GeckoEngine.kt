@@ -65,7 +65,8 @@ object GeckoEngine {
         session.open(rt)
         tabs.add(tab)
         if (select) selectTab(tab.id)
-        if (url != null) session.loadUri(url)
+        // JANGAN panggil loadUri() di sini — session belum ditempel ke GeckoView.
+        // pendingUrl akan dimuat oleh BrowserScreen setelah view attached.
         return tab
     }
 
@@ -74,6 +75,27 @@ object GeckoEngine {
         activeTabId = id
         // Beri tahu ekstensi tentang tab aktif (API tabs.*).
         tabs.find { it.id == id }?.let { ExtensionManager.setTabActive(it.session) }
+    }
+
+    /**
+     * Muat URL di tab dengan benar:
+     * - Jika tab masih halaman tab baru: set pendingUrl, biarkan BrowserScreen
+     *   memuat setelah session ditempel ke view (hindari bug blank).
+     * - Jika tab sudah web biasa: loadUri langsung (session sudah attached).
+     */
+    fun loadUrl(tab: Tab, url: String) {
+        if (tab.isNewTabPage) {
+            tab.pendingUrl = url
+            tab.isNewTabPage = false
+        } else {
+            // Session sudah attached ke view — aman load langsung.
+            // Tapi jika pendingUrl masih ada (belum dimuat), gabungkan.
+            if (tab.pendingUrl != null) {
+                tab.pendingUrl = url
+            } else {
+                tab.session.loadUri(url)
+            }
+        }
     }
 
     fun closeTab(id: String) {
