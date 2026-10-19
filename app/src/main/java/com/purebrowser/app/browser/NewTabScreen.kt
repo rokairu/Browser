@@ -93,7 +93,8 @@ private val DEFAULT_SHORTCUTS = listOf(
 fun NewTabScreen(tab: Tab) {
     val focusManager = LocalFocusManager.current
     var query by remember { mutableStateOf("") }
-    var engine by remember { mutableStateOf(SearchEngine.DUCKDUCKGO) }
+    // Default Google: paling kompatibel (DuckDuckGo bermasalah di sebagian perangkat).
+    var engine by remember { mutableStateOf(SearchEngine.GOOGLE) }
     var engineMenuOpen by remember { mutableStateOf(false) }
 
     fun navigate(target: String) {
