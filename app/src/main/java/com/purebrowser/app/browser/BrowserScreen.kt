@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MoreVert
@@ -94,6 +95,7 @@ fun BrowserScreen(
     var showBookmarks by remember { mutableStateOf(false) }
     var showHistory by remember { mutableStateOf(false) }
     var showProfiles by remember { mutableStateOf(false) }
+    var showExtensions by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         // ---- Bilah atas ----
@@ -206,6 +208,11 @@ fun BrowserScreen(
                         leadingIcon = { Icon(Icons.Default.VpnKey, null) },
                     )
                     DropdownMenuItem(
+                        text = { Text(text = "Ekstensi") },
+                        onClick = { menuOpen = false; showExtensions = true },
+                        leadingIcon = { Icon(Icons.Default.Extension, null) },
+                    )
+                    DropdownMenuItem(
                         text = { Text(text = "Ganti profil") },
                         onClick = { menuOpen = false; showProfiles = true },
                         leadingIcon = { Icon(Icons.Default.People, null) },
@@ -257,6 +264,9 @@ fun BrowserScreen(
     }
     if (showHistory) {
         HistoryDialog(onClose = { showHistory = false })
+    }
+    if (showExtensions) {
+        ExtensionsDialog(onClose = { showExtensions = false })
     }
     if (showProfiles) {
         ProfileSwitchDialog(
