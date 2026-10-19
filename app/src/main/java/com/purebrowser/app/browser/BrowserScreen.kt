@@ -256,23 +256,35 @@ fun BrowserScreen(
         }
 
         // ---- Area web / halaman tab baru ----
+        // GeckoView SELALU di-composition (tidak kondisional). Ini pola robust
+        // resmi GeckoView: session selalu attached ke view yang terpasang di
+        // hierarki, sehingga loadUri() bisa dipanggil langsung kapan saja.
+        // Pola lama (AndroidView kondisional + pendingUrl di update) terbukti
+        // rapuh dan menyebabkan halaman blank permanen (v1.3/v1.4).
+        // Halaman tab baru tampil sebagai overlay native di atas GeckoView.
         if (tab != null) {
-            if (tab.isNewTabPage) {
-                NewTabScreen(tab = tab)
-            } else {
+            Box(Modifier.fillMaxSize().weight(1f)) {
                 AndroidView(
                     factory = { geckoView },
                     update = { view ->
-                        view.setSession(tab.session)
-                        // Muat URL yang tertunda SETELAH session ditempel ke view.
-                        // Ini perbaikan bug halaman blank.
+                        if (view.session !== tab.session) {
+                            android.util.Log.d("PureBrowser", "setSession tab=${tab.id.take(8)}")
+                            view.setSession(tab.session)
+                        }
+                        // Fallback: muat URL tertunda (dari newTab(url), mis.
+                        // halaman opsi ekstensi / restore tab) SETELAH session
+                        // attached. Navigasi normal memakai loadUri langsung.
                         tab.pendingUrl?.let { url ->
                             tab.pendingUrl = null
+                            android.util.Log.d("PureBrowser", "memuat pendingUrl: $url")
                             tab.session.loadUri(url)
                         }
                     },
-                    modifier = Modifier.fillMaxSize().weight(1f),
+                    modifier = Modifier.fillMaxSize(),
                 )
+                if (tab.isNewTabPage) {
+                    NewTabScreen(tab = tab)
+                }
             }
         } else {
             Box(Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {
