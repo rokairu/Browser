@@ -59,7 +59,14 @@ class BrowserActivity : ComponentActivity() {
                     onSwitchProfile = { newId -> switchProfile(newId) },
                     onOpenProfileManager = {
                         GeckoEngine.persistTabs(this)
-                        startActivity(Intent(this, com.purebrowser.app.MainActivity::class.java))
+                        startActivity(
+                            Intent(this, com.purebrowser.app.MainActivity::class.java).apply {
+                                putExtra(
+                                    com.purebrowser.app.MainActivity.EXTRA_MANAGE_PROFILES,
+                                    true,
+                                )
+                            }
+                        )
                     },
                     onExit = {
                         GeckoEngine.shutdown()
