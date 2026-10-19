@@ -36,7 +36,7 @@ class BrowserActivity : ComponentActivity() {
         GeckoEngine.init(profileCtx)
         if (GeckoEngine.tabs.isEmpty()) {
             if (!GeckoEngine.restoreTabs(this)) {
-                GeckoEngine.newTab(HOME_URL)
+                GeckoEngine.newTab()
             }
         }
 
@@ -104,6 +104,5 @@ class BrowserActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_PROFILE_ID = "profile_id"
-        const val HOME_URL = "https://duckduckgo.com"
     }
 }
