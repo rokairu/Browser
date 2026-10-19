@@ -21,9 +21,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Newspaper
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -41,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -58,15 +66,15 @@ enum class SearchEngine(val label: String, val searchUrl: String) {
     BING("Bing", "https://www.bing.com/search?q="),
 }
 
-private data class Shortcut(val name: String, val url: String, val emoji: String)
+private data class Shortcut(val name: String, val url: String, val icon: ImageVector)
 
 private val DEFAULT_SHORTCUTS = listOf(
-    Shortcut("Google", "https://www.google.com", "🔍"),
-    Shortcut("YouTube", "https://m.youtube.com", "▶️"),
-    Shortcut("Wikipedia", "https://id.wikipedia.org", "📚"),
-    Shortcut("GitHub", "https://github.com", "🐙"),
-    Shortcut("Kamus", "https://kbbi.web.id", "📖"),
-    Shortcut("Berita", "https://www.detik.com", "📰"),
+    Shortcut("Google", "https://www.google.com", Icons.Filled.Search),
+    Shortcut("YouTube", "https://m.youtube.com", Icons.Filled.PlayArrow),
+    Shortcut("Wikipedia", "https://id.wikipedia.org", Icons.Filled.MenuBook),
+    Shortcut("GitHub", "https://github.com", Icons.Filled.Code),
+    Shortcut("Kamus", "https://kbbi.web.id", Icons.Filled.Translate),
+    Shortcut("Berita", "https://www.detik.com", Icons.Filled.Newspaper),
 )
 
 /**
@@ -96,8 +104,19 @@ fun NewTabScreen(tab: Tab) {
     ) {
         Spacer(Modifier.height(56.dp))
 
-        // Logo
-        Text(text = "🌐", fontSize = 56.sp)
+        // Logo — ikon globe vektor dalam lingkaran, bukan emoji
+        Box(
+            modifier = Modifier.size(96.dp).clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                Icons.Filled.Language,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(56.dp),
+            )
+        }
         Spacer(Modifier.height(12.dp))
         Text(
             text = "PureBrowser",
@@ -151,15 +170,14 @@ fun NewTabScreen(tab: Tab) {
                 ),
                 textStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
             )
-            // Pemilih mesin pencari
+            // Pemilih mesin pencari — ikon saja agar tidak kepotong
             Box {
                 IconButton(onClick = { engineMenuOpen = true }) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = engine.label.take(6), fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.primary)
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = "Pilih mesin pencari",
-                            tint = MaterialTheme.colorScheme.primary)
-                    }
+                    Icon(
+                        Icons.Filled.Tune,
+                        contentDescription = "Pilih mesin pencari: ${engine.label}",
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
                 }
                 DropdownMenu(
                     expanded = engineMenuOpen,
@@ -168,6 +186,9 @@ fun NewTabScreen(tab: Tab) {
                     SearchEngine.entries.forEach { e ->
                         DropdownMenuItem(
                             text = { Text(text = e.label) },
+                            trailingIcon = {
+                                if (e == engine) Text(text = "✓", color = MaterialTheme.colorScheme.primary)
+                            },
                             onClick = { engine = e; engineMenuOpen = false },
                         )
                     }
@@ -201,7 +222,12 @@ fun NewTabScreen(tab: Tab) {
                         .padding(vertical = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text(text = s.emoji, fontSize = 28.sp)
+                    Icon(
+                        s.icon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(32.dp),
+                    )
                     Spacer(Modifier.height(6.dp))
                     Text(
                         text = s.name, fontSize = 12.sp,
