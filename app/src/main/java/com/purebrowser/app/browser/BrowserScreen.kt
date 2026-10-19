@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
@@ -48,6 +50,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -97,8 +100,13 @@ fun BrowserScreen(
     var showHistory by remember { mutableStateOf(false) }
     var showProfiles by remember { mutableStateOf(false) }
     var showExtensions by remember { mutableStateOf(false) }
+    var showTheme by remember { mutableStateOf(false) }
 
-    Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    Column(
+        Modifier.fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .navigationBarsPadding()
+    ) {
         // ---- Bilah atas ----
         Row(
             modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(8.dp),
@@ -221,6 +229,11 @@ fun BrowserScreen(
                         leadingIcon = { Icon(Icons.Default.Extension, null) },
                     )
                     DropdownMenuItem(
+                        text = { Text(text = "Tema") },
+                        onClick = { menuOpen = false; showTheme = true },
+                        leadingIcon = { Icon(Icons.Default.Brightness6, null) },
+                    )
+                    DropdownMenuItem(
                         text = { Text(text = "Ganti profil") },
                         onClick = { menuOpen = false; showProfiles = true },
                         leadingIcon = { Icon(Icons.Default.People, null) },
@@ -275,6 +288,9 @@ fun BrowserScreen(
     }
     if (showExtensions) {
         ExtensionsDialog(onClose = { showExtensions = false })
+    }
+    if (showTheme) {
+        ThemeDialog(onClose = { showTheme = false })
     }
     if (showProfiles) {
         ProfileSwitchDialog(
@@ -520,5 +536,48 @@ private fun ProfileSwitchDialog(
         },
         confirmButton = { TextButton(onClick = onManage) { Text(text = "Kelola profil") } },
         dismissButton = { TextButton(onClick = onClose) { Text(text = "Batal") } },
+    )
+}
+
+@Composable
+private fun ThemeDialog(onClose: () -> Unit) {
+    val context = LocalContext.current
+    var current by remember { mutableStateOf(com.purebrowser.app.ui.ThemePreference.mode) }
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(text = "Tema tampilan") },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                com.purebrowser.app.ui.ThemeMode.entries.forEach { m ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                com.purebrowser.app.ui.ThemePreference.set(context, m)
+                                current = m
+                            }
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = m == current,
+                            onClick = {
+                                com.purebrowser.app.ui.ThemePreference.set(context, m)
+                                current = m
+                            },
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(text = m.label, fontSize = 15.sp)
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = "Pilih \"Ikuti sistem\" agar otomatis, atau kunci ke Terang/Gelap.",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                )
+            }
+        },
+        confirmButton = { TextButton(onClick = onClose) { Text(text = "Tutup") } },
     )
 }
