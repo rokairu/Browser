@@ -4,12 +4,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import android.os.Handler
+import android.os.Looper
 import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoRuntime
 import org.mozilla.geckoview.GeckoSession
 import org.mozilla.geckoview.WebExtension
 import org.mozilla.geckoview.WebExtensionController
 import java.io.File
+
+/** Jalankan di main thread — callback GeckoResult tidak dijamin di main thread. */
+private val mainHandler = Handler(Looper.getMainLooper())
+private fun onMain(block: () -> Unit) {
+    if (Looper.myLooper() == Looper.getMainLooper()) block()
+    else mainHandler.post { block() }
+}
 
 /**
  * Pengelola ekstensi WebExtension (mesin yang sama dengan Firefox Android).
@@ -80,31 +89,40 @@ object ExtensionManager {
     fun refresh() {
         val c = controller ?: return
         c.list().accept(
-            { list ->
+            { list -> onMain {
                 extensions.clear()
-                // Tampilkan yang bukan built-in sistem saja tidak perlu;
-                // tampilkan semua apa adanya.
                 extensions.addAll((list ?: emptyList()).sortedBy { it.metaData?.name ?: it.id })
-            },
-            { err -> lastError = err?.message ?: "Gagal memuat daftar ekstensi" },
+            } },
+            { err -> onMain {
+                lastError = err?.message ?: "Gagal memuat daftar ekstensi"
+            } },
         )
     }
 
-    /** Install dari file .xpi lokal (hasil unduhan/picker). File disalin ke penyimpanan privat dulu. */
+    /** Install dari file .xpi lokal. File dihapus otomatis setelah selesai (sukses/gagal). */
     fun installFromFile(xpiFile: File) {
         val c = controller ?: run {
             lastError = "Pengelola ekstensi belum siap"
+            try { xpiFile.delete() } catch (_: Exception) { }
             return
         }
         isBusy = true
         lastError = null
-        val uri = "file://${xpiFile.absolutePath}"
+        // Encode path untuk URI file:// yang valid.
+        val uri = "file://" + java.net.URLEncoder.encode(
+            xpiFile.absolutePath, "UTF-8"
+        ).replace("%2F", "/")
         c.install(uri, WebExtensionController.INSTALLATION_METHOD_FROM_FILE).accept(
-            { isBusy = false; refresh() },
-            { err ->
+            { onMain {
                 isBusy = false
+                try { xpiFile.delete() } catch (_: Exception) { }
+                refresh()
+            } },
+            { err -> onMain {
+                isBusy = false
+                try { xpiFile.delete() } catch (_: Exception) { }
                 lastError = describeInstallError(err)
-            },
+            } },
         )
     }
 
@@ -117,11 +135,11 @@ object ExtensionManager {
         isBusy = true
         lastError = null
         c.install(url, WebExtensionController.INSTALLATION_METHOD_FROM_FILE).accept(
-            { isBusy = false; refresh() },
-            { err ->
+            { onMain { isBusy = false; refresh() } },
+            { err -> onMain {
                 isBusy = false
                 lastError = describeInstallError(err)
-            },
+            } },
         )
     }
 
@@ -135,13 +153,15 @@ object ExtensionManager {
         }
         // WebExtension immutable: enable/disable mengembalikan instance baru.
         result.accept(
-            { updated ->
+            { updated -> onMain {
                 if (updated != null) {
                     val i = extensions.indexOfFirst { it.id == updated.id }
                     if (i >= 0) extensions[i] = updated else refresh()
                 } else refresh()
-            },
-            { err -> lastError = err?.message ?: "Gagal mengubah status ekstensi" },
+            } },
+            { err -> onMain {
+                lastError = err?.message ?: "Gagal mengubah status ekstensi"
+            } },
         )
     }
 
@@ -149,8 +169,10 @@ object ExtensionManager {
         val c = controller ?: return
         lastError = null
         c.uninstall(extension).accept(
-            { refresh() },
-            { err -> lastError = err?.message ?: "Gagal menghapus ekstensi" },
+            { onMain { refresh() } },
+            { err -> onMain {
+                lastError = err?.message ?: "Gagal menghapus ekstensi"
+            } },
         )
     }
 
