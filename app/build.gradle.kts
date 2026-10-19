@@ -56,6 +56,8 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    // Pemuatan favicon situs untuk akses cepat
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
     // Mesin browser mandiri (Gecko/Firefox) — bukan System WebView.
     // v153 = versi terbaru yang lolos AAR metadata check di compileSdk 36
