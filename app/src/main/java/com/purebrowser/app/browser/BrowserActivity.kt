@@ -13,6 +13,7 @@ import com.purebrowser.app.profile.ProfileContext
 import com.purebrowser.app.profile.ProfileManager
 import com.purebrowser.app.profile.ProfileRuntime
 import com.purebrowser.app.ui.PureBrowserTheme
+import com.purebrowser.app.ui.ThemePreference
 import org.mozilla.geckoview.GeckoView
 
 class BrowserActivity : ComponentActivity() {
@@ -21,6 +22,7 @@ class BrowserActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ThemePreference.load(this)
 
         val pm = ProfileManager(applicationContext)
         val profiles = pm.ensureDefault()
