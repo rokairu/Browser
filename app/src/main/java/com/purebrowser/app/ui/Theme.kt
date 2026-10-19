@@ -28,12 +28,12 @@ private val LightColors = lightColorScheme(
 )
 
 /**
- * Theme PureBrowser — otomatis mengikuti mode gelap/terang sistem.
- * Bisa dioverride manual via parameter darkTheme (untuk pengaturan nanti).
+ * Theme PureBrowser — mode bisa diatur manual (Sistem/Terang/Gelap).
+ * Default mengikuti sistem.
  */
 @Composable
 fun PureBrowserTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = ThemePreference.isDark(isSystemInDarkTheme()),
     content: @Composable () -> Unit,
 ) {
     MaterialTheme(
